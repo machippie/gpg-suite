@@ -1,0 +1,23 @@
+# Standards: 0.1
+---
+- name: Fact gpg-suite user
+  set_fact:
+    gpg_suite_user: "{{ gpg_suite_user | default(homebrew_user) | default(ansible_user_id) }}"
+  tags:
+    - gpg-suite
+
+- become: "{{ (gpg_suite_user != ansible_user_id) | bool }}"
+  become_user: "{{ gpg_suite_user }}"
+  block:
+    - name: Install required package
+      ignore_errors: True
+      homebrew_cask:
+        name: gpg-suite
+        greedy: True
+        options: appdir=/Applications
+        accept_external_apps: False
+        state: upgraded
+      tags:
+        - gpg-suite
+
+...
